@@ -3,10 +3,6 @@
 unsigned short *video = (unsigned short *) 0xB8000;
 
 //key map com as teclas ABNT2
-// unsigned char key_map[150] = {
-//     0x00, 0x01, '1', '2', '3', '4', '5', '6', '7', '8',
-//     '9', '0', '-', '=', '*', '*', 'q', 'w'
-// };
 
 unsigned char key_map[150] = {
 0x00, 0x01, '1',  '2',  '3',  '4',  '5',  '6',  '7',  '8',  '9',  '0',  '-',  '=', 'N/D',
