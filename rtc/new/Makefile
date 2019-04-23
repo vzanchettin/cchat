@@ -1,4 +1,4 @@
-PROJECT = test-vga
+PROJECT = test-global
 
 SOURCES += src/main.c
 
