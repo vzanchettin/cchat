@@ -8,6 +8,6 @@
 
 #### Já na pasta testes, temos o código que realiza a conversão de uma data/hora para timestamp, mas não realiza o processo inverso nesse momento. OBS: Assim que realizar o restante dos ajustes os códigos da pasta seram inseridos no restante dos códigos da pasta new. 
 
-###OBS:
+### OBS:
 
 #### A hora retornada pelo registrador, no código da pasta new, esta vindo com 3 hora a mais, pela questão do fuso  horário. Isso vai ser ajustado quando for terminado a questão da conversão do timestap na pasta testes.
