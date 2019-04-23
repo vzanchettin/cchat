@@ -6,8 +6,10 @@
 void getTimestamp(int* timestamp);
 // retorna uma string com o o seguinte formato [dia/mês/ano hora:minutos]
 unsigned char*  toString(int* timestamp);
+// retorna um char* com a estring no seguinte formato "[dia/mês/ano hora:minuto]"
+void getDataHora(char* timestamp);
 
-/* void getTimestramp(int* timestamp){
+void getDataHora(char* timestamp){
     timestamp[0] = '[';
     getDia(timestamp);
     getMes(timestamp);
@@ -15,7 +17,7 @@ unsigned char*  toString(int* timestamp);
     getHora(timestamp);
     getMinuto(timestamp);
     timestamp[15] = ']';
-} */
+}
 // Printa o dia
 void getDia(char* timestamp){
     outb(0x70, 0x07);
