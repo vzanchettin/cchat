@@ -1,83 +1,37 @@
-#include <errno.h>
-#include <fcntl.h>
-#include <string.h>
-#include <termios.h>
-#include <unistd.h>
+#include <io.h>
 
-int
-set_interface_attribs (int fd, int speed, int parity)
-{
-        struct termios tty;
-        memset (&tty, 0, sizeof tty);
-        if (tcgetattr (fd, &tty) != 0)
-        {
-                error_message ("error %d from tcgetattr", errno);
-                return -1;
-        }
+#define PORT 0x3f8   /* COM1 */
 
-        cfsetospeed (&tty, speed);
-        cfsetispeed (&tty, speed);
-
-        tty.c_cflag = (tty.c_cflag & ~CSIZE) | CS8;     // 8-bit chars
-        // disable IGNBRK for mismatched speed tests; otherwise receive break
-        // as \000 chars
-        tty.c_iflag &= ~IGNBRK;         // disable break processing
-        tty.c_lflag = 0;                // no signaling chars, no echo,
-                                        // no canonical processing
-        tty.c_oflag = 0;                // no remapping, no delays
-        tty.c_cc[VMIN]  = 0;            // read doesn't block
-        tty.c_cc[VTIME] = 5;            // 0.5 seconds read timeout
-
-        tty.c_iflag &= ~(IXON | IXOFF | IXANY); // shut off xon/xoff ctrl
-
-        tty.c_cflag |= (CLOCAL | CREAD);// ignore modem controls,
-                                        // enable reading
-        tty.c_cflag &= ~(PARENB | PARODD);      // shut off parity
-        tty.c_cflag |= parity;
-        tty.c_cflag &= ~CSTOPB;
-        tty.c_cflag &= ~CRTSCTS;
-
-        if (tcsetattr (fd, TCSANOW, &tty) != 0)
-        {
-                error_message ("error %d from tcsetattr", errno);
-                return -1;
-        }
-        return 0;
+void init_serial() {
+   outb(PORT + 1, 0x00);    // Disable all interrupts
+   outb(PORT + 3, 0x80);    // Enable DLAB (set baud rate divisor)
+   outb(PORT + 0, 0x03);    // Set divisor to 3 (lo byte) 38400 baud
+   outb(PORT + 1, 0x00);    //                  (hi byte)
+   outb(PORT + 3, 0x03);    // 8 bits, no parity, one stop bit
+   outb(PORT + 2, 0xC7);    // Enable FIFO, clear them, with 14-byte threshold
+   outb(PORT + 4, 0x0B);    // IRQs enabled, RTS/DSR set
 }
 
-void
-set_blocking (int fd, int should_block)
-{
-        struct termios tty;
-        memset (&tty, 0, sizeof tty);
-        if (tcgetattr (fd, &tty) != 0)
-        {
-                error_message ("error %d from tggetattr", errno);
-                return;
-        }
-
-        tty.c_cc[VMIN]  = should_block ? 1 : 0;
-        tty.c_cc[VTIME] = 5;            // 0.5 seconds read timeout
-
-        if (tcsetattr (fd, TCSANOW, &tty) != 0)
-                error_message ("error %d setting term attributes", errno);
+int serial_received() {
+   return inb(PORT + 5) & 1;
 }
 
-char *portname = "/dev/ttyUSB1";
+char read_serial() {
+   while (serial_received() == 0);
 
-int fd = open (portname, O_RDWR | O_NOCTTY | O_SYNC);
-if (fd < 0)
-{
-        error_message ("error %d opening %s: %s", errno, portname, strerror (errno));
-        return;
+   return inb(PORT);
 }
 
-set_interface_attribs (fd, B115200, 0);  // set speed to 115,200 bps, 8n1 (no parity)
-set_blocking (fd, 0);                // set no blocking
+int is_transmit_empty() {
+   return inb(PORT + 5) & 0x20;
+}
 
-write (fd, "hello!\n", 7);           // send 7 character greeting
+void write_serial(char a) {
+   while (is_transmit_empty() == 0);
 
-usleep ((7 + 25) * 100);             // sleep enough to transmit the 7 plus
-                                     // receive 25:  approx 100 uS per char transmit
-char buf [100];
-int n = read (fd, buf, sizeof buf);  // read up to 100 characters if ready to read
+   outb(PORT,a);
+}
+
+int main(void) {
+    write_serial('b');
+}

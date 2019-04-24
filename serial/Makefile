@@ -1,50 +1,49 @@
-# Define o nome do projeto/binário que será gerado.
-TARGET = avr-lcd-proj
+PROJECT = test-vga
 
-# Define os fontes do projeto.
-SOURCES += \
-	main.c
+SOURCES += src/main.c
 
-# Modelo do microcontrolador.
-#  Arduino Uno  = atmega328p
-#  Arduino Mega = atmega2560
-MCU = atmega2560
+LIBPATH = lib
+include $(LIBPATH)/lib.mk
 
-# Frequência do cristal.
-F_CPU = 16000000UL
+CC = gcc
+AS = nasm
+LD = ld
+CP = cp
+DEL = rm
+QEMU = qemu-system-i386
 
-# Opções do programador.
-#  PG 	   = arduino (Arduino Uno) | wiring (Arduino Mega/ADK)
-#  PG_PORT = porta de comunicação
-#  PG_BAUD = velocidade de gravação
-PG		= wiring
-PG_PORT	= /dev/ttyACM0
-PG_BAUD	= 115200
-
-# Outras configurações.
-CC		= avr-gcc
-CP		= cp
-DEL 	= rm
-OBJCOPY = avr-objcopy
-
-CFLAGS  = -Os -Wall -Wextra -g -std=gnu99 -DF_CPU=$(F_CPU)
-ARCH	= -mmcu=$(MCU)
+CFLAGS  += -nostdinc -nostdlib -nodefaultlibs -nostartfiles -static \
+	   -ffreestanding -fno-builtin -fno-exceptions -fno-stack-protector \
+	   -m32 -std=gnu99 -O0 -Wall -Wextra -g
+ASFLAGS = -f elf32 -O0
+LDFLAGS = -m elf_i386 -nostdlib
 
 OBJECTS = $(SOURCES:.c=.o)
 
-all: $(TARGET).hex
+all: $(PROJECT).elf
 
-%.hex: %.elf
-	$(OBJCOPY) -R .eeprom -j .text -j .data -O ihex $< $@
+$(PROJECT).iso: $(PROJECT).elf
+	$(CP) $< iso/boot/kernel.elf
+	grub-mkrescue -o $@ iso
 
-$(TARGET).elf: $(OBJECTS)
-	$(CC) $(CFLAGS) $(ARCH) $^ -o $@
+$(PROJECT).elf: boot/loader.o $(OBJECTS)
+	$(LD) $(LDFLAGS) -T linker.ld -o $@ $^
+
+%.o: %.S
+	$(AS) $(ASFLAGS) $< -o $@
 
 %.o: %.c
-	$(CC) -c $(CFLAGS) $(ARCH) -o $@ $(CCFLAGS) $<
+	$(CC) -c $(CFLAGS) -o $@ $(CCFLAGS) $<
 
 clean:
-	$(DEL) -f *.o *.elf *.hex
+	$(DEL) -f **/*.elf *.o **/*.o **/**/*.o iso/boot/*.elf *.img *.iso *.elf
 
-prog: $(TARGET).hex
-	sudo avrdude -D -c $(PG) -p $(MCU) -P $(PG_PORT) -b $(PG_BAUD) -U flash:w:$<
+run: $(PROJECT).elf
+	$(QEMU) -soundhw pcspk -monitor stdio -kernel $<
+
+run-img: $(PROJECT).iso
+	$(QEMU) -soundhw pcspk -monitor stdio -hda $<
+
+debug: kernel.elf
+	$(QEMU) -soundhw pcspk -serial mon:stdio -s -S -kernel $< &
+	gdb -iex "set auto-load safe-path .gdbinit" $<

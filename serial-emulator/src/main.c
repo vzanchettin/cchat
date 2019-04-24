@@ -1,39 +1,44 @@
 #include <sys/io.h>
 
-unsigned short *video = (unsigned short *) 0xB8000;
+#define PORT 0x3f8   /* COM1 */
 
-//key map com as teclas ABNT2
+void init_serial() {
+   outb(PORT + 1, 0x00);    // Disable all interrupts
+   outb(PORT + 3, 0x80);    // Enable DLAB (set baud rate divisor)
+   outb(PORT + 0, 0x03);    // Set divisor to 3 (lo byte) 38400 baud
+   outb(PORT + 1, 0x00);    //                  (hi byte)
+   outb(PORT + 3, 0x03);    // 8 bits, no parity, one stop bit
+   outb(PORT + 2, 0xC7);    // Enable FIFO, clear them, with 14-byte threshold
+   outb(PORT + 4, 0x0B);    // IRQs enabled, RTS/DSR set
+}
 
-unsigned char key_map[150] = {
-0x00, 0x01, '1',  '2',  '3',  '4',  '5',  '6',  '7',  '8',  '9',  '0',  '-',  '=', 'N/D',
-'N/D', 'q',  'w',  'e',  'r',  't',  'y',  'u',  'i',  'o',  'p',  '´',  '[',
-'N/D', 'N/D', 'a',  's',  'd',  'f',  'g',  'h',  'j',  'k',  'l',  'ç',  '~',  ']',
-'N/D', '\\',  'z',  'x',  'c',  'v',  'b',  'n',  'm',  ',',  '.',  ';',  'N/D'
-};
+int serial_received() {
+   return inb(PORT + 5) & 1;
+}
 
-int main(void)
-{
-    int key = 0;
+char read_serial() {
+   while (serial_received() == 0);
+
+   return inb(PORT);
+}
+
+int is_transmit_empty() {
+   return inb(PORT + 5) & 0x20;
+}
+
+void write_serial(char a) {
+   while (is_transmit_empty() == 0);
+
+   outb(PORT,a);
+}
+
+int main(void) {
+
+    init_serial();
 
     while (1) {
-        key = inb(0x60);
-        printc(0, 0, 0x05, 0x01, key_map[key]);
+        char c = read_serial();
+        write_serial('\n');
+        write_serial(c);
     }
-
-    return 0;
-}
-
-void prints(int x, int y, int fcolor, int bcolor, char *str) {
-    int inicio = x + y * 80; // *80 para ir pra proxima linha da matrix 80x25
-
-    while (*str) {
-        video[inicio] = (fcolor << 8) | (bcolor << 12) | *str;
-
-        inicio++;
-        str++;
-    }
-}
-
-void printc(int x, int y, int fcolor, int bcolor, int c) {
-    video[80] = (fcolor << 8) | (bcolor << 12) | c;
 }
