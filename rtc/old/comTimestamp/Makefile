@@ -1,4 +1,4 @@
-PROJECT = test-vga
+PROJECT = test-global
 
 SOURCES += src/main.c
 
@@ -39,7 +39,7 @@ clean:
 	$(DEL) -f **/*.elf *.o **/*.o **/**/*.o iso/boot/*.elf *.img *.iso *.elf
 
 run: $(PROJECT).elf
-	$(QEMU) -soundhw pcspk -serial /dev/pts/3 -kernel $<
+	$(QEMU) -soundhw pcspk -monitor stdio -kernel $<
 
 run-img: $(PROJECT).iso
 	$(QEMU) -soundhw pcspk -monitor stdio -hda $<
@@ -47,3 +47,4 @@ run-img: $(PROJECT).iso
 debug: kernel.elf
 	$(QEMU) -soundhw pcspk -serial mon:stdio -s -S -kernel $< &
 	gdb -iex "set auto-load safe-path .gdbinit" $<
+

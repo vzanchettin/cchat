@@ -2,6 +2,9 @@
     "files.associations": {
         "time.h": "c",
         "timestamp.h": "c",
-        "videoprints.h": "c"
+        "videoprints.h": "c",
+        "stdlib.h": "c",
+        "string.h": "c",
+        "stdio.h": "c"
     }
 }

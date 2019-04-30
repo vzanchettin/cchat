@@ -11,3 +11,12 @@
 ### OBS:
 
 #### A hora retornada pelo registrador, no código da pasta new, esta vindo com 3 hora a mais, pela questão do fuso  horário. Isso vai ser ajustado quando for terminado a questão da conversão do timestap na pasta testes.
+
+#### RTC registers:
+	*   00    current second in BCD
+	*	02    current minute in BCD
+	*	04    current hour in BCD
+	*	06    day of week  in BCD
+	*	07    day of month in BCD
+	*	08    month in BCD
+	*	09    year  in BCD (00-99)
