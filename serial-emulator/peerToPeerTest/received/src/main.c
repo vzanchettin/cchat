@@ -10,7 +10,6 @@ int main(void) {
 
     while (1) {
         char c = read_serial();
-        write_serial('\n');
-        write_serial(c);
+        printc(3, 10, 0x07, 0x04, c);
     }
 }

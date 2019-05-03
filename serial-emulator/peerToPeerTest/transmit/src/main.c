@@ -9,8 +9,8 @@ int main(void) {
     initVideo();
 
     while (1) {
-        char c = read_serial();
-        write_serial('\n');
-        write_serial(c);
+        for(int x=0; x<=10000;x++){
+           write_serial((char)x);
+        }
     }
 }
