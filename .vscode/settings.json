@@ -6,6 +6,7 @@
         "stdlib.h": "c",
         "string.h": "c",
         "stdio.h": "c",
-        "timedate.h": "c"
+        "timedate.h": "c",
+        "serial.h": "c"
     }
 }
