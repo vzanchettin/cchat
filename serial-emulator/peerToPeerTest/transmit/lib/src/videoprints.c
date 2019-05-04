@@ -4,7 +4,7 @@
 unsigned short *video;
 
 // Inicializa o video
-void initVideo(){
+void init_Video(){
     
     video = (unsigned short *)0xB8000;
 

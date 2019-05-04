@@ -1,8 +1,7 @@
 #include <sys/serial.h>
 #include <sys/io.h>
-#define PORT 0x3f8   /* COM1 */
 
-void init_serial() {
+void init_serial(int PORT) {
    outb(PORT + 1, 0x00);    // Disable all interrupts
    outb(PORT + 3, 0x80);    // Enable DLAB (set baud rate divisor)
    outb(PORT + 0, 0x03);    // Set divisor to 3 (lo byte) 38400 baud
@@ -12,22 +11,22 @@ void init_serial() {
    outb(PORT + 4, 0x0B);    // IRQs enabled, RTS/DSR set
 }
 
-int serial_received() {
+int serial_received(int PORT) {
    return inb(PORT + 5) & 1;
 }
 
-char read_serial() {
-   while (serial_received() == 0);
+char read_serial(int PORT) {
+   while (serial_received(PORT) == 0);
 
    return inb(PORT);
 }
 
-int is_transmit_empty() {
+int is_transmit_empty(int PORT) {
    return inb(PORT + 5) & 0x20;
 }
 
-void write_serial(char a) {
-   while (is_transmit_empty() == 0);
+void write_serial(char a, int PORT) {
+   while (is_transmit_empty(PORT) == 0);
 
    outb(PORT,a);
 }

@@ -40,7 +40,6 @@ clean:
 
 run: $(PROJECT).elf
 	$(QEMU) -soundhw pcspk -serial /dev/pts/3 -kernel $<
-
 run-img: $(PROJECT).iso
 	$(QEMU) -soundhw pcspk -monitor stdio -hda $<
 

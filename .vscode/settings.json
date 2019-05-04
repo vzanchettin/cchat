@@ -7,6 +7,7 @@
         "string.h": "c",
         "stdio.h": "c",
         "timedate.h": "c",
-        "serial.h": "c"
+        "serial.h": "c",
+        "teclado.h": "c"
     }
 }
