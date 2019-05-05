@@ -19,6 +19,8 @@ int main(void)
     init_serial(COM2);
     init_Video();
     init_teclado();
+    
+    desenhaTela();
 
     while (1)
     {
