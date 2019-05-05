@@ -3,6 +3,7 @@
 #include <sys/videoprints.h>
 #include <sys/teclado.h>
 #include <sys/io.h>
+
 //char COM2 = 0x2f8;   /* COM2 */
 /* Porta   Endereco I/O    IRQ
 COM1    3F8              4
@@ -12,7 +13,6 @@ COM4    2E8              3 */
 
 int main(void)
 {
-
     int COM1 = 0x3f8; /* COM1 */
     int COM2 = 0x2e8; /* COM2 */
     init_serial(COM1);
@@ -22,11 +22,9 @@ int main(void)
 
     while (1)
     {
-        char c = tecla();
-        //printc(3, 10, 0x07, 0x04, c);
-
-        write_serial(c, COM2);
-
-        printc(3, 10, 0x07, 0x04, read_serial(COM1));
+      char c = tecla();
+      //printc(3, 10, 0x07, 0x04, c);
+      write_serial(c, COM2);
+      printc(3, 10, 0x07, 0x04, read_serial(COM1));
     }
 }
