@@ -1,5 +1,7 @@
 #include <sys/teclado.h>
 #include <sys/videoprints.h>
+#include <sys/history.h>
+#include <sys/timedate.h>
 #include <sys/io.h>
 
 char key_map[250];
@@ -119,7 +121,7 @@ char map_key(int scancode){
     }
 }
 
-char tecla(){
+char tecla(char** historico,int *linha,char *msg,int *indexMSG){
      int scancode = inb(0x60);
 
         print(scancode);
@@ -128,14 +130,23 @@ char tecla(){
 
         if (key != key_anterior && key > 0 && key != '*') {
 
-            print(key);
+           // print(key);
             printc(posx, posy, 0x01, 0x0F, key);
-
+            msg[*indexMSG++] = key;
+            msg[*indexMSG] = '\0';  
             posx++;
             key_anterior = key;
         } else if (key != key_anterior && key == '*') {
-            posy++;
-            posx = 0;
+            // AQUI VAI O LANCE QUE MONTA O PACOTE e envia menssagem
+                    indexMSG = 0;
+                    linha++;
+                    if(linha > 16){
+                        linha = 2;
+                    }
+                    montahistorico(msg, day(), month(), year(), minute(), second(), hour(), historico, linha);
+            posy = 23;
+            posx = 2;
+            prints(posx, posy, 0x00, 0x00, "                                                           ");
             key_anterior = key;
         }
     return  key;
