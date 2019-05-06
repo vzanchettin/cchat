@@ -130,20 +130,21 @@ char tecla(char** historico,int *linha,char *msg,int *indexMSG){
 
         if (key != key_anterior && key > 0 && key != '*') {
 
-           // print(key);
+           // print(key);v
             printc(posx, posy, 0x01, 0x0F, key);
-            msg[*indexMSG++] = key;
-            msg[*indexMSG] = '\0';  
+            msg[(*indexMSG)++] = key;
             posx++;
             key_anterior = key;
         } else if (key != key_anterior && key == '*') {
             // AQUI VAI O LANCE QUE MONTA O PACOTE e envia menssagem
-                    indexMSG = 0;
-                    linha++;
-                    if(linha > 16){
-                        linha = 2;
+                    msg[*indexMSG] = '\0';  
+                    *indexMSG = 0;
+                    (*linha)++;
+                    if(*linha > 16){
+                        *linha = 2;
                     }
-                    montahistorico(msg, day(), month(), year(), minute(), second(), hour(), historico, linha);
+                  
+                    montahistorico(msg, day(), month(), year(), minute(), second(), hour(), historico, *linha);
             posy = 23;
             posx = 2;
             prints(posx, posy, 0x00, 0x00, "                                                           ");

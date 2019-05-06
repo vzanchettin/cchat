@@ -17,9 +17,10 @@ int main(void)
     desenhaTela();
 
     char historico[20][78];
-    int *linha = 2;
+    int linha = 2;
+    
     char msg[64];
-    int *indexMSG = 0;
+    int indexMSG = 0;
 
     while (1)
     {
@@ -27,7 +28,7 @@ int main(void)
             char c = read_serial(COM);
             printc(5, 11, 0x02, 0x08, c); // mostra o que recebeu 
         }
-        tecla(&historico, &linha, &msg, &indexMSG);
+        tecla(historico, &linha, msg, &indexMSG);
  }
 }
 
