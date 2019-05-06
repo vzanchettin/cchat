@@ -4,8 +4,8 @@
 
 char key_map[250];
 
-unsigned int posx = 0;
-unsigned int posy = 10;
+unsigned int posx = 2;
+unsigned int posy = 23;
 
 int key = 0;
 int key_anterior = 0;
