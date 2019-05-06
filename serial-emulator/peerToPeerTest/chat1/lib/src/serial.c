@@ -16,7 +16,11 @@ int serial_received(int PORT) {
 }
 
 char read_serial(int PORT) {
-   while (serial_received(PORT) == 0);
+   //while (serial_received() == 0);
+
+   if (serial_received(PORT) == 0) {
+      return 0;
+   }
 
    return inb(PORT);
 }
@@ -26,7 +30,7 @@ int is_transmit_empty(int PORT) {
 }
 
 void write_serial(char a, int PORT) {
-   while (is_transmit_empty(PORT) == 0);
+   //while (is_transmit_empty(PORT) == 0);
 
    outb(PORT,a);
 }

@@ -12,20 +12,23 @@ COM4    2E8              3 */
 
 int main(void)
 {
-    int COM1 = 0x3f8; /* COM1 */
-    int COM2 = 0x3e8; /* COM2 */
-    init_serial(COM1);
-    init_serial(COM2);
+    int COM = 0x3f8; /* COM1 */
+    init_serial(COM);
     init_Video();
     init_teclado();
-
+    char t = ' ';
     while (1)
     {
-        char c = tecla();
-        //printc(3, 10, 0x07, 0x04, c);
-
-        write_serial(c, COM1);
-
-        printc(3, 10, 0x07, 0x04, read_serial(COM2));
+        if (serial_received(COM))
+        {
+            char c = read_serial(COM);
+            printc(5, 11, 0x02, 0x08, c);
+        }
+        t = tecla();
+        if (t != ' ')
+        {
+            write_serial(t, COM);
+            t = ' ';
+        }
     }
 }
